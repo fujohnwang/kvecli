@@ -1,0 +1,1 @@
+java --enable-native-access=ALL-UNNAMED -jar  /kvecli-1.0.0-SNAPSHOT-shaded.jar

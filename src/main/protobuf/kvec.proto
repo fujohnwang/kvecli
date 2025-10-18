@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package com.keevol.kvectors.grpc;
+
+option java_package = "com.keevol.kvectors.grpc";
+option java_multiple_files = true;
+
+service HelloService {
+  rpc Hello (HelloRequest) returns (HelloReply) {}
+}
+
+service HelloService2 {
+  rpc Hello (HelloRequest) returns (HelloReply) {}
+}
+
+message HelloRequest {
+  string name = 1;
+}
+
+message HelloReply {
+  string message = 1;
+}
+
+// -----vector DB level messages --------------
+
+message ListCollectionRequest{}
+
+message ListCollectionResponse{
+  repeated string collection = 1 ;
+}
+
+enum IndexType{
+  NO = 0;
+  ANN = 1;
+}
+enum Compress{
+  // src/main/protobuf/kvec.proto:33:3: "NO" is already defined in "com.keevol.kvectors.grpc".
+  // src/main/protobuf/kvec.proto:33:3: Note that enum values use C++ scoping rules, meaning that enum values are siblings of their type, not children of it.  Therefore, "NO" must be unique within "com.keevol.kvectors.grpc", not just within "Compress".
+  NEVER = 0;
+  ZSTD = 1;
+  LZ4 = 2;
+}
+enum SimilarityAlgorithm{
+  COSINE = 0;
+  DOT_PRODUCT = 1;
+  EUCLIDEAN = 2;
+}
+
+message CreateCollectionRequest{
+  string name = 1;
+  IndexType indexType = 2;
+  optional Compress compress = 3;
+  optional SimilarityAlgorithm similarityAlg = 4;
+  optional bool transient = 5;
+}
+message CreateCollectionResponse{
+  string message = 1;
+}
+
+
+service KVectorsDBService {
+  rpc ListVectorCollections (ListCollectionRequest) returns (ListCollectionResponse) {}
+  rpc CreateVectorCollection (CreateCollectionRequest) returns (CreateCollectionResponse) {}
+}
+
+
+
+// -----vector collection level messages --------------
+
+message AddVectorRequest{
+  string collection = 1;
+  repeated float vector = 2;
+  string rid = 3;
+  optional string meta = 4; // in json format
+}
+message AddVectorResponse{
+  string message = 1;
+}
+
+message VectorQueryRequest{
+  string collection = 1;
+  repeated float vector = 2;
+  optional float threshold = 3;
+  optional int32 topK = 4;
+}
+
+message VectorQueryResult{
+  int64 id = 1; // usually mean nothing to client
+  float score = 2;
+  string meta = 3;
+}
+message VectorQueryResponse{
+  repeated VectorQueryResult results = 1;
+}
+
+
+service KVectorCollectionService{
+  rpc AddVector (AddVectorRequest) returns (AddVectorResponse) {}
+  rpc Query (VectorQueryRequest) returns (VectorQueryResponse) {}
+}
+
+
+
+
+

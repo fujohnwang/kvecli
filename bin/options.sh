@@ -1,0 +1,3 @@
+--enable-native-access=ALL-UNNAMED --add-modules jdk.incubator.vector -javaagent:./opentelemetry-javaagent.jar \
+                                                                           -Dotel.service.name=my-hybrid-app \
+                                                                           -Dotel.metrics.exporter=prometheus \
